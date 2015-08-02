@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/abc_button_padding_horizontal_material"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/from"
+        android:singleLine="true"
+        android:inputType="text"
+        android:gravity="start|top"
+        android:padding="15dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_background"/>
+
+    <EditText
+        android:id="@+id/phoneNumber"
+        android:maxLength="11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/empty_phone_number"
+        android:singleLine="true"
+        android:inputType="phone"
+        android:gravity="start|top"
+        android:padding="15dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/rounded_corner_background"/>
+
+    <EditText
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/empty_message"
+        android:inputType="textMultiLine"
+        android:focusable="false"
+        android:gravity="start|top"
+        android:padding="15dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_corner_background"/>
+    <Button
+        android:id="@+id/send_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/send_message_label"
+        android:layout_gravity="center"
+        android:background="@drawable/button_background"
+        android:layout_margin="15dp"
+        android:padding="15dp"
+        android:textColor="@color/background_material_light"/>
+</LinearLayout>

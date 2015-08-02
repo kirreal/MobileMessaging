@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Mobile Messaging App</string>
+
+    <string name="empty_message">Your message</string>
+    <string name="from">From</string>
+    <string name="empty_phone_number">Phone number</string>
+    <string name="send_message_label">Send</string>
+    <string name="sending_title">Sending message.</string>
+    <string name="sending_message">Your message is currently being send.</string>
+
+    <string name="getting_location">Getting your current address.</string>
+    <string name="get_location_fail">Failed to get your current address.</string>
+    <string name="location_service_not_available">Failed to connect location service.</string>
+    <string name="invalid_lat_long_used">Your position doesn\'t match any address.</string>
+    <string name="no_address_found">Your position doesn\'t match any address.</string>
+
+    <string name="send_message_success">Your message is successfully sent.</string>
+    <string name="send_message_fail">Your message is not sent.</string>
+    <string name="operation_cancelled">Operation cancelled by user.</string>
+    <string name="ok_label">Ok</string>
+    <string name="message_prefix">Hi, this is </string>
+    <string name="location_message_prefix">I\'m at: </string>
+    <string name="cancel_label">Cancel</string>
+    <string name="action_settings">Settings</string>
+
+    <color name="header_color">#426987</color>
+    <color name="background_color">#bccee0</color>
+</resources>
