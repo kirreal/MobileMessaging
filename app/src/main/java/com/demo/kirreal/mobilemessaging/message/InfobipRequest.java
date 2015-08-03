@@ -8,14 +8,14 @@ import org.json.JSONObject;
  */
 public class InfobipRequest {
     private String from;
-    private int to;
+    private long to;
     private String text;
 
-    public int getTo() {
+    public long getTo() {
         return to;
     }
 
-    public void setTo(int to) {
+    public void setTo(long to) {
         this.to = to;
     }
 

@@ -24,15 +24,13 @@ public class LocationService implements GoogleApiClient.ConnectionCallbacks,
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private Context mContext;
-    private LocationServiceHandler mHandler;
     public static final String ADDRESS_KEY = "adress";
     public static final String ERROR_CODE_KEY = "erorr_code";
     public static final String ERROR_MESSAGE_KEY = "erorr_message";
     public static final int GEOCODING_ADDREESS_LIMIT = 1;
 
-    public LocationService(final Context ctx, final LocationServiceHandler handler) {
+    public LocationService(final Context ctx) {
         mContext = ctx;
-        mHandler = handler;
     }
 
     private synchronized void buildGoogleApiClient() {

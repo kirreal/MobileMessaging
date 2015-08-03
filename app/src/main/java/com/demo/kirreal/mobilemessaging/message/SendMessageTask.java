@@ -21,7 +21,6 @@ public class SendMessageTask extends AsyncTask<Object, Void, String> {
         String response = "";
         mFragment = (MessageFragment) params[0];
         InfobipRequest message = (InfobipRequest) params[1];
-
         HttpsResponseSender responseSender = new HttpsResponseSender();
 
         try {

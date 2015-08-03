@@ -21,6 +21,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by kmoshias on 03.08.2015.
  */
 public class HttpsResponseSender {
+    private static final int CONNECTION_TIMEOUT = 15000;
 
     public String sendPost(String targetURL, String jsonString) throws IOException {
         HttpsURLConnection connection = null;
@@ -31,7 +32,6 @@ public class HttpsResponseSender {
             sendRequest(jsonString, connection);
 
             return getResponse(connection);
-
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -44,27 +44,36 @@ public class HttpsResponseSender {
     }
 
     private String getResponse(HttpURLConnection connection) throws IOException {
-        InputStream is = connection.getInputStream();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-        String line;
-        StringBuffer response = new StringBuffer();
+        String responseMessage = "";
 
-        while((line = rd.readLine()) != null) {
-            response.append(line);
-            response.append('\r');
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            InputStream is = connection.getInputStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+            String line;
+            StringBuffer response = new StringBuffer();
+
+            while((line = rd.readLine()) != null) {
+                response.append(line);
+                response.append('\r');
+            }
+            rd.close();
+            responseMessage = response.toString();
+        } else {
+            responseMessage = "Server error " + connection.getResponseCode() + " " + connection.getResponseMessage();
         }
-        rd.close();
 
-        return response.toString();
+        return responseMessage;
     }
 
     private void sendRequest(String jsonString, HttpURLConnection connection) throws IOException {
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("accept", "application/json");
         connection.setRequestProperty("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
         connection.setUseCaches(false);
         connection.setDoInput(true);
         connection.setDoOutput(true);
+        connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
         DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
         wr.writeBytes(URLEncoder.encode(jsonString, "UTF-8"));

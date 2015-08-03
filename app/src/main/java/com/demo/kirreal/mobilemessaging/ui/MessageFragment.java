@@ -18,7 +18,6 @@ import android.widget.EditText;
 
 import com.demo.kirreal.mobilemessaging.R;
 import com.demo.kirreal.mobilemessaging.location.LocationService;
-import com.demo.kirreal.mobilemessaging.location.LocationServiceHandler;
 import com.demo.kirreal.mobilemessaging.message.InfobipRequest;
 import com.demo.kirreal.mobilemessaging.message.MessageService;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -34,7 +33,6 @@ public class MessageFragment extends Fragment {
     public static final String MESSAGE_KEY = "message";
     public static final java.lang.String AUTHOR_KEY = "author";
     private LocationService mLocationService;
-    private LocationServiceHandler mHandler;
     private ProgressDialog mProgress;
     private EditText mAuthor;
     private EditText mMessage;
@@ -77,8 +75,7 @@ public class MessageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHandler = new LocationServiceHandler(this);
-        mLocationService = new LocationService(getActivity(), mHandler);
+        mLocationService = new LocationService(getActivity());
         IntentFilter intentFilter = new IntentFilter(LocationService.ADRESS_RESOLVED);
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
 
@@ -117,7 +114,7 @@ public class MessageFragment extends Fragment {
         InfobipRequest infobipMessage = new InfobipRequest();
 
         infobipMessage.setFrom(mAuthor.getText().toString());
-        infobipMessage.setTo(Integer.parseInt(mPhoneNumber.getText().toString()));
+        infobipMessage.setTo(Long.parseLong(mPhoneNumber.getText().toString()));
         infobipMessage.setText(messageBody);
 
         try {
