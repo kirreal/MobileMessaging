@@ -18,7 +18,7 @@
     <string name="send_message_fail">Your message is not sent.</string>
     <string name="operation_cancelled">Operation cancelled by user.</string>
     <string name="ok_label">Ok</string>
-    <string name="message_prefix">Hi, this is </string>
+    <string name="message_prefix">Hi, it\'s </string>
     <string name="location_message_prefix">I\'m at: </string>
     <string name="cancel_label">Cancel</string>
     <string name="action_settings">Settings</string>

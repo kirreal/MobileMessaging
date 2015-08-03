@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,11 @@ import android.widget.EditText;
 import com.demo.kirreal.mobilemessaging.R;
 import com.demo.kirreal.mobilemessaging.location.LocationService;
 import com.demo.kirreal.mobilemessaging.location.LocationServiceHandler;
+import com.demo.kirreal.mobilemessaging.message.InfobipRequest;
+import com.demo.kirreal.mobilemessaging.message.MessageService;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by kmoshias on 29.07.2015.
@@ -107,18 +110,49 @@ public class MessageFragment extends Fragment {
     }
 
     public void onLocationRetrieveSuccess(String location) {
-        mMessage.setText(buildMessage());
+        String messageBody = buildMessage(location);
+
+        mMessage.setText(messageBody);
+        MessageService messageService = new MessageService();
+        InfobipRequest infobipMessage = new InfobipRequest();
+
+        infobipMessage.setFrom(mAuthor.getText().toString());
+        infobipMessage.setTo(Integer.parseInt(mPhoneNumber.getText().toString()));
+        infobipMessage.setText(messageBody);
+
+        try {
+            messageService.sendMessage(this, infobipMessage);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    private String buildMessage() {
+    private String buildMessage(String location) {
         StringBuilder sb = new StringBuilder();
 
+        sb.append(R.string.message_prefix);
         sb.append(mAuthor.getText());
-        sb.append(" ");
+        sb.append(".");
         sb.append(getString(R.string.location_message_prefix));
         sb.append(" ");
+        sb.append(location);
 
         return sb.toString();
+    }
+
+    public void onSendMessageSuccess(String response) {
+        OkAlertDialog dialog = new OkAlertDialog(this, R.string.send_message_fail, response);
+
+        dialog.show(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        reset();
+        stopProgress();
     }
 
     public void onGoogleServiceFail(int errorCode) {
@@ -168,6 +202,7 @@ public class MessageFragment extends Fragment {
 
         activity.startProgress();
         mSendButton.setEnabled(false);
+        mAuthor.setEnabled(false);
         mPhoneNumber.setEnabled(false);
         mMessage.setEnabled(false);
     }
@@ -177,6 +212,7 @@ public class MessageFragment extends Fragment {
 
         activity.stopProgress();
         mSendButton.setEnabled(true);
+        mAuthor.setEnabled(true);
         mPhoneNumber.setEnabled(true);
         mMessage.setEnabled(true);
     }

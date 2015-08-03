@@ -62,7 +62,7 @@ public class LocationService implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void disconnect() {
-        if (mGoogleApiClient.isConnected() || mGoogleApiClient.isConnecting()) {
+        if (mGoogleApiClient != null && (mGoogleApiClient.isConnected() || mGoogleApiClient.isConnecting())) {
             mGoogleApiClient.disconnect();
         }
     }
