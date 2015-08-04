@@ -23,10 +23,12 @@ import com.demo.kirreal.mobilemessaging.location.LocationService;
 
 public class MainActivity extends Activity {
     private LinearLayout mHeaderProgress;
+    public static String PACKAGE_NAME = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PACKAGE_NAME = getPackageName();
         setContentView(R.layout.container_layout);
         MessageFragment fragment = null;
 

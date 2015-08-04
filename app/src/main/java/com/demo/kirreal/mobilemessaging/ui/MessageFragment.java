@@ -85,6 +85,7 @@ public class MessageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.message_layout, container, false);
+
         mAuthor = (EditText) view.findViewById(R.id.author);
         mPhoneNumber = (EditText) view.findViewById(R.id.phoneNumber);
         mMessage = (EditText) view.findViewById(R.id.message);
@@ -129,7 +130,7 @@ public class MessageFragment extends Fragment {
     private String buildMessage(String location) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(R.string.message_prefix);
+        sb.append(getString(R.string.message_prefix));
         sb.append(mAuthor.getText());
         sb.append(".");
         sb.append(getString(R.string.location_message_prefix));

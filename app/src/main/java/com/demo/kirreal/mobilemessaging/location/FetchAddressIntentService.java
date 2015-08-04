@@ -66,13 +66,15 @@ public class FetchAddressIntentService extends IntentService {
     }
 
     private String getAddressString(Address address) {
-        List<String> addressFragments = new ArrayList<String>();
+        StringBuilder sb = new StringBuilder();
 
-        for(int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-            addressFragments.add(address.getAddressLine(i));
-        }
+        sb.append(address.getLocality());
+        sb.append(" ");
+        sb.append(address.getThoroughfare());
+        sb.append(" ");
+        sb.append(address.getSubThoroughfare());
 
-        return TextUtils.join(" ", addressFragments);
+        return sb.toString();
     }
 
 }
