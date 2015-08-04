@@ -239,6 +239,7 @@ public class MessageFragment extends Fragment {
         mLocationService.disconnect();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
     }
+
     public class SendMessageTask extends AsyncTask<Object, Void, String> {
         private final String SINGLE_MESSAGE_URL = "https://api.infobip.com/sms/1/text/single";
 

@@ -48,11 +48,11 @@ public class HttpsResponseSender {
         postMethod.setEntity(new StringEntity(jsonString));
         postMethod.setHeader("Content-Type", "application/json");
         response = httpClient.execute(postMethod);
-        Log.d("", EntityUtils.toString(response.getEntity()));
-        in = response.getEntity().getContent();
         StatusLine statusLine = response.getStatusLine();
 
         if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
+            Log.d("", EntityUtils.toString(response.getEntity()));
+            in = response.getEntity().getContent();
             responseString = convertStreamToString(in);
         } else {
             String msg = statusLine.getStatusCode() + " " + statusLine.getReasonPhrase();

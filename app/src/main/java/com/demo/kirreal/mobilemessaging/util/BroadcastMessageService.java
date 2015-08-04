@@ -8,9 +8,6 @@ import android.util.Log;
 
 import com.demo.kirreal.mobilemessaging.location.LocationService;
 
-/**
- * Created by kmoshias on 04.08.2015.
- */
 public class BroadcastMessageService {
 
     public static void sendBroadcastMessage(Context ctx, Message msg) {
