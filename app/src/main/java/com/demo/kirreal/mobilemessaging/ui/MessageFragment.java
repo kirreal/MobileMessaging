@@ -268,10 +268,12 @@ public class MessageFragment extends Fragment {
             super.onPostExecute(response);
             Message msg = Message.obtain();
 
-            msg.what = TRANSMIT_SUCCESS;
-            msg.getData().putString(RESPONSE_KEY, response);
+            if (!response.equals("")) {
+                msg.what = TRANSMIT_SUCCESS;
+                msg.getData().putString(RESPONSE_KEY, response);
 
-            BroadcastMessageService.sendBroadcastMessage(getActivity(), msg);
+                BroadcastMessageService.sendBroadcastMessage(getActivity(), msg);
+            }
         }
     }
 }
