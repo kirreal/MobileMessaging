@@ -23,6 +23,10 @@
     <string name="cancel_label">Cancel</string>
     <string name="action_settings">Settings</string>
 
+    <string name="numeric_validation_error">ID length should be between 3 and 14 digits</string>
+    <string name="alphanumeric_validation_error">ID length should be between 3 and 11 characters</string>
+    <string name="phone_validation_error">Phone number must be 11 digits</string>
+
     <color name="header_color">#426987</color>
     <color name="background_color">#bccee0</color>
 </resources>

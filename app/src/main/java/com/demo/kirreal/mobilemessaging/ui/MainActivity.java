@@ -2,23 +2,15 @@ package com.demo.kirreal.mobilemessaging.ui;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Message;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import com.demo.kirreal.mobilemessaging.R;
-import com.demo.kirreal.mobilemessaging.location.LocationService;
 
 
 public class MainActivity extends Activity {

@@ -6,9 +6,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Message;
-import android.os.Messenger;
-import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.demo.kirreal.mobilemessaging.R;
@@ -16,7 +13,6 @@ import com.demo.kirreal.mobilemessaging.ui.MessageFragment;
 import com.demo.kirreal.mobilemessaging.util.BroadcastMessageService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,10 +63,16 @@ public class FetchAddressIntentService extends IntentService {
         StringBuilder sb = new StringBuilder();
 
         sb.append(address.getLocality());
-        sb.append(" ");
-        sb.append(address.getThoroughfare());
-        sb.append(" ");
-        sb.append(address.getSubThoroughfare());
+
+        if (address.getThoroughfare().length() > 0) {
+            sb.append(" ");
+            sb.append(address.getThoroughfare());
+        }
+
+        if (address.getSubThoroughfare().length() > 0) {
+            sb.append(" ");
+            sb.append(address.getSubThoroughfare());
+        }
 
         return sb.toString();
     }

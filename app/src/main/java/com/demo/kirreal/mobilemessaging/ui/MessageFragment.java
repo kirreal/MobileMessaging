@@ -20,11 +20,13 @@ import android.widget.EditText;
 import com.demo.kirreal.mobilemessaging.R;
 import com.demo.kirreal.mobilemessaging.location.LocationService;
 import com.demo.kirreal.mobilemessaging.message.InfobipRequest;
+import com.demo.kirreal.mobilemessaging.message.InfobipResponse;
+import com.demo.kirreal.mobilemessaging.message.InfobipResponseMessageParser;
 import com.demo.kirreal.mobilemessaging.util.BroadcastMessageService;
 import com.demo.kirreal.mobilemessaging.util.HttpsResponseSender;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
 public class MessageFragment extends Fragment {
     public static final String TAG = "MessageFragment";
@@ -77,16 +79,16 @@ public class MessageFragment extends Fragment {
                 onSendMessageFail(error);
                 break;
             case TRANSMIT_SUCCESS:
-                String responseString = messageData.getString(RESPONSE_KEY);
-                onSendMessageSuccess(responseString);
+                onSendMessageSuccess((InfobipResponse) message.obj);
                 break;
-       }
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocationService = new LocationService(getActivity());
+
         IntentFilter intentFilter = new IntentFilter(LocationService.ADRESS_RESOLVED);
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
 
@@ -112,8 +114,25 @@ public class MessageFragment extends Fragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startProgress();
-                mLocationService.getLastLocation();
+                AuthorFieldValidator authorValidator =
+                        new AuthorFieldValidator(getActivity(), mAuthor.getText().toString());
+                boolean isAuthorValid = authorValidator.validate();
+                PhoneNumberFieldValidator phoneValidator =
+                        new PhoneNumberFieldValidator(getActivity(), mPhoneNumber.getText().toString());
+                boolean isPhoneValid = phoneValidator.validate();
+
+                if (isAuthorValid && isPhoneValid) {
+                    startProgress();
+                    mLocationService.getLastLocation();
+                } else {
+                    if (!isAuthorValid) {
+                        mAuthor.setError(authorValidator.getError());
+                    }
+
+                    if (!isPhoneValid) {
+                        mPhoneNumber.setError(phoneValidator.getError());
+                    }
+                }
             }
         };
     }
@@ -125,28 +144,24 @@ public class MessageFragment extends Fragment {
         InfobipRequest infobipMessage = new InfobipRequest();
 
         infobipMessage.setFrom(mAuthor.getText().toString());
-        infobipMessage.setTo(Long.parseLong(mPhoneNumber.getText().toString()));
+        infobipMessage.setTo(mPhoneNumber.getText().toString());
         infobipMessage.setText(messageBody);
 
         new SendMessageTask().execute(infobipMessage);
     }
 
     private String buildMessage(String location) {
-        StringBuilder sb = new StringBuilder();
+        String message = new String();
 
-        sb.append(getString(R.string.message_prefix));
-        sb.append(" ");
-        sb.append(mAuthor.getText());
-        sb.append(".");
-        sb.append(getString(R.string.location_message_prefix));
-        sb.append(" ");
-        sb.append(location);
+        message += getString(R.string.message_prefix) + mAuthor.getText() + ". ";
+        message += getString(R.string.location_message_prefix);
+        message += " " + location;
 
-        return sb.toString();
+        return message;
     }
 
-    public void onSendMessageSuccess(String response) {
-        OkAlertDialog dialog = new OkAlertDialog(this, R.string.send_message_success, response);
+    public void onSendMessageSuccess(InfobipResponse response) {
+        OkAlertDialog dialog = new OkAlertDialog(this, R.string.send_message_success, response.getStatus());
 
         dialog.show(new DialogInterface.OnClickListener() {
             @Override
@@ -251,29 +266,42 @@ public class MessageFragment extends Fragment {
 
             try {
                 response = responseSender.sendPostJSONString(SINGLE_MESSAGE_URL, message.toJSONString());
+                //response = InfobipResponse.getMockString();
             } catch (Exception e) {
-                Message msg = Message.obtain();
-
-                msg.what = TRANSMIT_FAIL;
-                msg.getData().putString(LocationService.ERROR_MESSAGE_KEY, e.getMessage());
-
-                BroadcastMessageService.sendBroadcastMessage(getActivity(), msg);
+                transmitFailed(e);
             }
 
             return response;
         }
 
+        private void transmitFailed(Exception e) {
+            Message msg = Message.obtain();
+
+            msg.what = TRANSMIT_FAIL;
+            msg.getData().putString(LocationService.ERROR_MESSAGE_KEY, e.getMessage());
+
+            BroadcastMessageService.sendBroadcastMessage(getActivity(), msg);
+            this.cancel(true);
+        }
+
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
-            Message msg = Message.obtain();
-
             if (!response.equals("")) {
-                msg.what = TRANSMIT_SUCCESS;
-                msg.getData().putString(RESPONSE_KEY, response);
+                List<InfobipResponse> infobipResponses = InfobipResponseMessageParser.parse(response);
 
-                BroadcastMessageService.sendBroadcastMessage(getActivity(), msg);
+                if (infobipResponses.size() > 0) {
+                    InfobipResponse infobipMessage = infobipResponses.get(0);
+                    Message msg = Message.obtain();
+
+                    msg.what = TRANSMIT_SUCCESS;
+                    msg.obj = infobipMessage;
+
+                    BroadcastMessageService.sendBroadcastMessage(getActivity(), msg);
+                    return;
+                }
             }
+            transmitFailed(new RuntimeException("Server response is empty"));
         }
     }
 }

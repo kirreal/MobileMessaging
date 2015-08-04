@@ -7,7 +7,6 @@ import android.app.Fragment;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 
-
 import com.demo.kirreal.mobilemessaging.R;
 
 public abstract class AlertDialogFragment extends DialogFragment {
