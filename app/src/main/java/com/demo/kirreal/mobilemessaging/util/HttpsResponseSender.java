@@ -1,123 +1,102 @@
 package com.demo.kirreal.mobilemessaging.util;
 
-import android.app.Application;
-import android.content.res.Resources;
-import android.net.Uri;
-import android.os.Environment;
+import android.util.Log;
 
-import com.demo.kirreal.mobilemessaging.R;
+import com.demo.kirreal.mobilemessaging.message.SendMessageException;
 
-import java.io.BufferedInputStream;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.util.EntityUtils;
+
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.security.KeyManagementException;
+import java.net.URI;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
-import javax.security.cert.X509Certificate;
-
-import static com.demo.kirreal.mobilemessaging.R.*;
-
-/**
- * Created by kmoshias on 03.08.2015.
- */
 public class HttpsResponseSender {
-    private static final int DEFAULT_TIMEOUT = 15000;
+    private static final String USER_NAME = "kirreal";
+    private static final String PASSWORD = "kirreal";
 
-    public String sendPostJSONString(String targetURL, String jsonString) throws IOException,
-            KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyManagementException,
-            CertificateException {
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        InputStream certificateFileInput = Resources.getSystem().openRawResource(raw.infobip);
-        Certificate certificate;
 
-        try {
-            certificate = cf.generateCertificate(certificateFileInput);
-        } finally {
-            certificateFileInput.close();
-        }
-        HttpsURLConnection connection = null;
-        URL url = new URL(targetURL);
-        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        trustStore.load(null, null);
-        trustStore.setCertificateEntry("ca", certificate);
+    public String sendPostJSONString(String targetURL, String jsonString) throws Exception {
+        String responseString = "";
+        DefaultHttpClient httpClient = getNewHttpClient();
+        HttpResponse response = null;
+        InputStream in;
+        URI newURI = URI.create(targetURL);
+        HttpPost postMethod = new HttpPost(newURI);
+        httpClient.getCredentialsProvider().setCredentials(new AuthScope(targetURL, 443),
+                new UsernamePasswordCredentials(USER_NAME, PASSWORD));
 
-        String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-        tmf.init(trustStore);
+        postMethod.setEntity(new StringEntity(jsonString));
+        postMethod.setHeader("Content-Type", "application/json");
+        response = httpClient.execute(postMethod);
+        Log.d("", EntityUtils.toString(response.getEntity()));
+        in = response.getEntity().getContent();
+        StatusLine statusLine = response.getStatusLine();
 
-        SSLContext context = SSLContext.getInstance("TLS");
-        context.init(null, tmf.getTrustManagers(), null);
-
-        try {
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.setSSLSocketFactory(context.getSocketFactory());
-            sendRequest(jsonString, connection);
-
-            return getResponse(connection);
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return null;
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-    }
-
-    private void sendRequest(String jsonString, HttpsURLConnection connection) throws IOException {
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("accept", "application/json");
-        connection.setRequestProperty("Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
-        connection.setUseCaches(false);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setConnectTimeout(DEFAULT_TIMEOUT);
-
-        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-        wr.writeBytes(URLEncoder.encode(jsonString, "UTF-8"));
-        wr.flush();
-        wr.close();
-    }
-
-    private String getResponse(HttpsURLConnection connection) throws IOException {
-        String responseMessage = "";
-
-        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            InputStream in = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(in));
-            String line;
-            StringBuffer response = new StringBuffer();
-
-            while ((line = rd.readLine()) != null) {
-                response.append(line);
-            }
-            rd.close();
-            responseMessage = response.toString();
+        if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
+            responseString = convertStreamToString(in);
         } else {
-            responseMessage = "Server error " + connection.getResponseCode() + " " + connection.getResponseMessage();
+            String msg = statusLine.getStatusCode() + " " + statusLine.getReasonPhrase();
+
+            throw new SendMessageException(msg);
         }
 
-        return responseMessage;
+        return responseString;
     }
 
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        is.close();
+
+        return sb.toString();
+    }
+
+    public DefaultHttpClient getNewHttpClient() {
+        try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+
+            CustomSSLSocketFactory sf = new CustomSSLSocketFactory(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+            HttpParams params = new BasicHttpParams();
+            HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(params, "UTF-8");
+
+            SchemeRegistry registry = new SchemeRegistry();
+            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            registry.register(new Scheme("https", sf, 443));
+
+            ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, registry);
+
+            return new DefaultHttpClient(ccm, params);
+        } catch (Exception e) {
+            return new DefaultHttpClient();
+        }
+    }
 }

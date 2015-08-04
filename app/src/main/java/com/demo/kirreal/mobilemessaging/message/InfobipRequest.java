@@ -35,7 +35,7 @@ public class InfobipRequest {
         this.from = from;
     }
 
-    String toJSONString() throws JSONException {
+    public String toJSONString() throws JSONException {
         JSONObject json = new JSONObject();
 
         json.put("from", getFrom());

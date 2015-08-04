@@ -13,15 +13,13 @@ import android.util.Log;
 
 import com.demo.kirreal.mobilemessaging.R;
 import com.demo.kirreal.mobilemessaging.ui.MessageFragment;
+import com.demo.kirreal.mobilemessaging.util.BroadcastMessageService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by kmoshias on 31.07.2015.
- */
 public class FetchAddressIntentService extends IntentService {
     public FetchAddressIntentService() {
         super("FetchAddressIntentService");
@@ -55,13 +53,13 @@ public class FetchAddressIntentService extends IntentService {
 
             msg.what = MessageFragment.SERVICE_FAIL;
             msg.getData().putString(LocationService.ADDRESS_KEY, errorMessage);
-            LocationService.sendBroadcastMessage(this, msg);
+            BroadcastMessageService.sendBroadcastMessage(this, msg);
         } else {
             Message msg = new Message();
 
             msg.what = MessageFragment.LOCATION_SERVICE_SUCCESS;
             msg.getData().putString(LocationService.ADDRESS_KEY, getAddressString(addresses.get(0)));
-            LocationService.sendBroadcastMessage(this, msg);
+            BroadcastMessageService.sendBroadcastMessage(this, msg);
         }
     }
 

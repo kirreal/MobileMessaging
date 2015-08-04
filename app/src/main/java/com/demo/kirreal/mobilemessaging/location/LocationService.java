@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.demo.kirreal.mobilemessaging.ui.MessageFragment;
+import com.demo.kirreal.mobilemessaging.util.BroadcastMessageService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -55,7 +56,7 @@ public class LocationService implements GoogleApiClient.ConnectionCallbacks,
             msg.what = MessageFragment.SERVICE_FAIL;
             msg.getData().putString(ERROR_MESSAGE_KEY, "Check your gps is turned on.");
 
-            LocationService.sendBroadcastMessage(mContext, msg);
+            BroadcastMessageService.sendBroadcastMessage(mContext, msg);
         }
     }
 
@@ -80,7 +81,7 @@ public class LocationService implements GoogleApiClient.ConnectionCallbacks,
         msg.what = MessageFragment.GOOGLE_SERVICE_FAIL;
         msg.getData().putInt(ERROR_CODE_KEY, i);
 
-        LocationService.sendBroadcastMessage(mContext, msg);
+        BroadcastMessageService.sendBroadcastMessage(mContext, msg);
     }
 
     @Override
@@ -91,15 +92,7 @@ public class LocationService implements GoogleApiClient.ConnectionCallbacks,
         msg.what = MessageFragment.GOOGLE_SERVICE_FAIL;
         msg.getData().putInt(ERROR_CODE_KEY, connectionResult.getErrorCode());
 
-        LocationService.sendBroadcastMessage(mContext, msg);
-    }
-
-    public static void sendBroadcastMessage(Context ctx, Message msg) {
-        Log.d("sender", "Broadcasting message");
-        Intent intent = new Intent(LocationService.ADRESS_RESOLVED);
-
-        intent.putExtra(LocationService.BROADCAST_MESSAGE_KEY, msg);
-        LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
+        BroadcastMessageService.sendBroadcastMessage(mContext, msg);
     }
 
     public void getLastLocation() {
