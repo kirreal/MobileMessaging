@@ -13,9 +13,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
-/**
- * Created by kmoshias on 31.07.2015.
- */
 public class LocationService implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     public static final String BROADCAST_MESSAGE_KEY = "location_service_message";

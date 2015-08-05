@@ -4,9 +4,6 @@ import android.content.Context;
 
 import com.demo.kirreal.mobilemessaging.R;
 
-/**
- * Created by kirreal on 05.08.2015.
- */
 public class PhoneNumberFieldValidator {
     private String mValue;
     private Context mCtx;

@@ -3,9 +3,6 @@ package com.demo.kirreal.mobilemessaging.message;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by kirreal on 02.08.2015.
- */
 public class InfobipRequest {
     private String from;
     private String to;

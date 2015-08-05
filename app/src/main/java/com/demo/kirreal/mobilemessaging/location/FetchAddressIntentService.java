@@ -62,16 +62,18 @@ public class FetchAddressIntentService extends IntentService {
     private String getAddressString(Address address) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(address.getLocality());
+        if (address != null) {
+            sb.append(address.getLocality());
 
-        if (address.getThoroughfare().length() > 0) {
-            sb.append(" ");
-            sb.append(address.getThoroughfare());
-        }
+            if (address.getThoroughfare() != null && address.getThoroughfare().length() > 0) {
+                sb.append(" ");
+                sb.append(address.getThoroughfare());
+            }
 
-        if (address.getSubThoroughfare().length() > 0) {
-            sb.append(" ");
-            sb.append(address.getSubThoroughfare());
+            if (address.getSubThoroughfare() != null && address.getSubThoroughfare().length() > 0) {
+                sb.append(" ");
+                sb.append(address.getSubThoroughfare());
+            }
         }
 
         return sb.toString();

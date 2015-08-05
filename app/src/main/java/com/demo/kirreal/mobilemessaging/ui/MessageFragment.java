@@ -1,7 +1,6 @@
 package com.demo.kirreal.mobilemessaging.ui;
 
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,10 +31,8 @@ public class MessageFragment extends Fragment {
     public static final String TAG = "MessageFragment";
     public static final String PHONE_NUMBER_KEY = "phone_number";
     public static final String MESSAGE_KEY = "message";
-    public static final java.lang.String AUTHOR_KEY = "author";
-    public static final java.lang.String RESPONSE_KEY = "response";
+    public static final String AUTHOR_KEY = "author";
     private LocationService mLocationService;
-    private ProgressDialog mProgress;
     private EditText mAuthor;
     private EditText mMessage;
     private EditText mPhoneNumber;
@@ -153,7 +150,7 @@ public class MessageFragment extends Fragment {
     private String buildMessage(String location) {
         String message = new String();
 
-        message += getString(R.string.message_prefix) + mAuthor.getText() + ". ";
+        message += getString(R.string.message_prefix) + " " + mAuthor.getText() + ". ";
         message += getString(R.string.location_message_prefix);
         message += " " + location;
 
@@ -266,7 +263,6 @@ public class MessageFragment extends Fragment {
 
             try {
                 response = responseSender.sendPostJSONString(SINGLE_MESSAGE_URL, message.toJSONString());
-                //response = InfobipResponse.getMockString();
             } catch (Exception e) {
                 transmitFailed(e);
             }
